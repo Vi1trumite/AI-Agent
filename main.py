@@ -16,6 +16,7 @@ client =  genai.Client(api_key=api_key)
 
 parser = argparse.ArgumentParser(description="CLI Chatbot powered by AI")
 parser.add_argument("message", type=str, help="Message you'd like to send to the chatbot.")
+parser.add_argument("--verbose", action="store_true", help="Enable verbose output")
 args = parser.parse_args()
 
 messages = [types.Content(role="user", parts=[types.Part(text=args.message)])]
@@ -25,6 +26,9 @@ response = client.models.generate_content(
     )
 if not response.usage_metadata:
     raise RuntimeError("No usage metadata to process...")
-print(f"Prompt tokens: {response.usage_metadata.prompt_token_count}")
-print(f"Response tokens: {response.usage_metadata.candidates_token_count}")
+
+if args.verbose:
+    print(f"User prompt: {args.message}")
+    print(f"Prompt tokens: {response.usage_metadata.prompt_token_count}")
+    print(f"Response tokens: {response.usage_metadata.candidates_token_count}")
 print(response.text)
