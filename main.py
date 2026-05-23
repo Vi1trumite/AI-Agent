@@ -3,6 +3,7 @@ import argparse
 from dotenv import load_dotenv
 from google import genai
 from google.genai import types
+from prompts import system_prompt
 
 
 
@@ -22,7 +23,9 @@ args = parser.parse_args()
 messages = [types.Content(role="user", parts=[types.Part(text=args.message)])]
 
 response = client.models.generate_content(
-    model="gemini-2.5-flash", contents=messages
+    model="gemini-2.5-flash", 
+    contents=messages,
+    config=types.GenerateContentConfig(system_instruction=system_prompt, temperature=0)
     )
 if not response.usage_metadata:
     raise RuntimeError("No usage metadata to process...")
