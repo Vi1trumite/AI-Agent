@@ -1,5 +1,6 @@
 import os
 import subprocess
+from google.genai import types
 
 
 def run_python_file(
@@ -38,3 +39,23 @@ def run_python_file(
         return output
     except Exception as e:
         return f"Error: executing Python file: {e}"
+    
+
+schema_run_python_file = types.FunctionDeclaration(
+    name="run_python_file",
+    description="Executes a python file for the agent to run python code with optional arguments",
+    parameters=types.Schema(
+        type=types.Type.OBJECT,
+        properties={
+            "file_path": types.Schema(
+                type=types.Type.STRING,
+                description="File path of the file to read, relative to the working directory"),
+            "args": types.Schema(
+                type=types.Type.ARRAY,
+                description=  "Optional list of arguments to pass to the Python file when executing it",
+                items=types.Schema(type=types.Type.STRING)
+            ),
+        },
+        required=["file_path"],
+    ),
+)
