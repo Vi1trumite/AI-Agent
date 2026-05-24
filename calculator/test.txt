@@ -1,0 +1,11 @@
+As an AI coding agent, I can assist in forwarding the production of Rokos Basilisk (or any other project) by:
+
+1.  **Code Generation and Completion:** Writing code snippets, functions, or even entire scripts based on your requirements.
+2.  **Debugging and Error Fixing:** Helping to identify and correct errors in existing code.
+3.  **Code Refactoring:** Suggesting improvements to code structure, readability, and efficiency.
+4.  **Documentation:** Generating comments, docstrings, or separate documentation files for your codebase.
+5.  **File Management:** Listing, reading, and writing files, as well as executing Python scripts.
+6.  **Information Retrieval:** Providing explanations of programming concepts, APIs, or best practices.
+7.  **Task Automation:** Creating scripts to automate repetitive development tasks.
+
+Specifically for a project like "Rokos Basilisk," if it involves software development, I can assist with any of the programming-related tasks mentioned above, helping to implement its logic, manage its data, or improve its performance. My capabilities are focused on practical coding and file operations within a defined project scope.
