@@ -1,5 +1,6 @@
 import os
 import argparse
+import sys
 from dotenv import load_dotenv
 from google import genai
 from google.genai import types
@@ -23,30 +24,41 @@ args = parser.parse_args()
 
 messages = [types.Content(role="user", parts=[types.Part(text=args.message)])]
 
-response = client.models.generate_content(
-    model="gemini-2.5-flash", 
-    contents=messages,
-    config=types.GenerateContentConfig(tools=[available_functions], system_instruction=system_prompt)
-    )
-if not response.usage_metadata:
-    raise RuntimeError("No usage metadata to process...")
-
 if args.verbose:
     print(f"User prompt: {args.message}")
-    print(f"Prompt tokens: {response.usage_metadata.prompt_token_count}")
-    print(f"Response tokens: {response.usage_metadata.candidates_token_count}")
-if response.function_calls is not None:
-    function_results = []
-    for function_call in response.function_calls:
-        function_call_result = call_function(function_call, verbose=args.verbose)
-        if not function_call_result.parts:
-            raise Exception("No parts in result")
-        if function_call_result.parts[0].function_response == None:
-            raise Exception("Should have a function response object")
-        if function_call_result.parts[0].function_response.response == None:
-            raise Exception("Should have a function result")
-        function_results.append(function_call_result.parts[0])
-        if args.verbose:
-            print(f"-> {function_call_result.parts[0].function_response.response}")
+
+for _ in range(20):
+    response = client.models.generate_content(
+        model="gemini-2.5-flash", 
+        contents=messages,
+        config=types.GenerateContentConfig(tools=[available_functions], system_instruction=system_prompt)
+        )
+    if response.candidates:
+        for candidate in response.candidates:
+            messages.append(candidate.content)
+    if not response.usage_metadata:
+        raise RuntimeError("No usage metadata to process...")
+
+    if args.verbose:
+        print(f"Prompt tokens: {response.usage_metadata.prompt_token_count}")
+        print(f"Response tokens: {response.usage_metadata.candidates_token_count}")
+    if response.function_calls is not None:
+        function_results = []
+        for function_call in response.function_calls:
+            function_call_result = call_function(function_call, verbose=args.verbose)
+            if not function_call_result.parts:
+                raise Exception("No parts in result")
+            if function_call_result.parts[0].function_response == None:
+                raise Exception("Should have a function response object")
+            if function_call_result.parts[0].function_response.response == None:
+                raise Exception("Should have a function result")
+            function_results.append(function_call_result.parts[0])
+            if args.verbose:
+                print(f"-> {function_call_result.parts[0].function_response.response}")
+        messages.append(types.Content(role="user", parts=function_results))
+    else:
+        print(response.text)
+        break
 else:
-    print(response.text)
+    print("Max iterations reached. Unable to retrieve data.")
+    sys.exit(1)
